@@ -26,4 +26,9 @@ class Fully_Connected_Layer():
     else: 
       self.error = self.next.delta.dot(self.next.weights.T) 
     self.delta = self.error*self.activation_prime(self.activated_outputs)
+    # TODO: Pass in learning rate from model  
     self.weights += self.prev.activated_outputs.T.dot(self.delta) * .001  
+class ConvolutionalLayer():
+    def __init__(self):
+        
+        pass

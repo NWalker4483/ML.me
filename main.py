@@ -18,7 +18,8 @@ for i in range(len(y)):
     
 net = NeuralNetwork()
 net.set_training_set(X[:10000],dataset[:10000])
-net.add_layer(6)
+net.add_layer(16)
+net.add_layer(16)
 net.add_layer(10)
 net.train(epochs = 9000,batch_size = 200, resolution = 5)
 print(net.get_acc(X[10000:16500],dataset[10000:16500]) * 100)
