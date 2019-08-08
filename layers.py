@@ -9,8 +9,6 @@ class Fully_Connected_Layer():
     self.activation = activations[activation]
     self.activation_prime = activations_prime[activation]
 
-    self.losses = []
-
   def forward(self,X):
     if self.prev == None: 
       self.activated_outputs = X
@@ -20,15 +18,19 @@ class Fully_Connected_Layer():
     return self.activated_outputs
   def backward(self,y):
     if self.prev == None:
-      return
+        return
     if self.next == None:
-      self.error = y - self.activated_outputs # error in output
+        self.error = y - self.activated_outputs # error in output
     else: 
-      self.error = self.next.delta.dot(self.next.weights.T) 
+        self.error = self.next.delta.dot(self.next.weights.T) 
     self.delta = self.error*self.activation_prime(self.activated_outputs)
     # TODO: Pass in learning rate from model  
     self.weights += self.prev.activated_outputs.T.dot(self.delta) * .001  
+  def description(self): # Provide String representation to store the model 
+    pass
 class ConvolutionalLayer():
     def __init__(self):
-        
+        self.__filters = []
+        pass
+    def description(self): # Provide String representation to store the model 
         pass
