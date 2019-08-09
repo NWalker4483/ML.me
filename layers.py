@@ -32,6 +32,7 @@ class PoolingLayer():
     def __init__(self,filter_shape=(2,2), stride=2, padding = False):
         self.next = None
         self.prev = None
+        self.stride = stride
         pass
     def forward(self,X):
         self.outputs = [] 
@@ -57,12 +58,14 @@ class PoolingLayer():
     def description(self): # Provide String representation to store the model 
         pass 
 class ConvolutionalLayer():
-    def __init__(self):
+    def __init__(self, stride=1, padding = False):
         self.__filters = []
+        self.next = None 
+        self.prev = None
+        self.stride = stride
+    def forward(self,X):
         pass
-    def forward(self):
-        pass
-    def backward(self):
+    def backward(self,y):
         pass
     def Convolve(self,img,filter):
         k = _filter.shape
