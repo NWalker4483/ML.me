@@ -42,9 +42,9 @@ class PoolingLayer():
         k = self.filter_shape
         offset = int(k[0]/2)
         x,y = offset,offset
-
-        x_ops = img.shape[0] - k[0] + k[0]%2 // self.stride 
-        y_ops = img.shape[1] - k[1] + k[1]%2 // self.stride
+        #NOTE: These op counts are unchecked 
+        x_ops = (img.shape[0] - k[0] // self.stride) + 1 
+        y_ops = (img.shape[1] - k[1] // self.stride) + 1
         final = np.zeros((x_ops,y_ops))
         for _y in range(y_ops):
             for _x in range(x_ops):
@@ -64,5 +64,20 @@ class ConvolutionalLayer():
         pass
     def backward(self):
         pass
+    def Convolve(self,img,filter):
+        k = _filter.shape
+        offset = int(k[0]/2)
+        x,y = offset,offset
+        #NOTE: These op counts are unchecked 
+        x_ops = (img.shape[0] - k[0] // self.stride) + 1 
+        y_ops = (img.shape[1] - k[1] // self.stride) + 1
+        final = np.zeros((x_ops,y_ops))
+        for _y in range(y_ops):
+            for _x in range(x_ops):
+                final[_y][_x] = _filter.dot(img[y-offset:y+offset+1][:,x-offset:x+offset+1])
+                x+=self.stride
+            x = offset
+            y+=self.stride
+        return final
     def description(self): # Provide String representation to store the model 
         pass
