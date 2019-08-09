@@ -38,12 +38,12 @@ class PoolingLayer():
         self.outputs = [] 
         for img in X:
             self.outputs.append(self.MaxPooling(img))
-        pass
+    
     def MaxPooling(self,img):
         k = self.filter_shape
         offset = int(k[0]/2)
         x,y = offset,offset
-        #NOTE: These op counts are unchecked 
+        # NOTE: These op counts are unchecked 
         x_ops = (img.shape[0] - k[0] // self.stride) + 1 
         y_ops = (img.shape[1] - k[1] // self.stride) + 1
         final = np.zeros((x_ops,y_ops))
@@ -54,24 +54,45 @@ class PoolingLayer():
             x = offset
             y+=self.stride
         return final
-
+    def AvgPooling(self,img):
+        k = self.filter_shape
+        offset = int(k[0]/2)
+        x,y = offset,offset
+        # NOTE: These op counts are unchecked 
+        x_ops = (img.shape[0] - k[0] // self.stride) + 1 
+        y_ops = (img.shape[1] - k[1] // self.stride) + 1
+        final = np.zeros((x_ops,y_ops))
+        for _y in range(y_ops):
+            for _x in range(x_ops):
+                final[_y][_x] = np.average(img[y-offset:y+offset+1][:,x-offset:x+offset+1])
+                x+=self.stride
+            x = offset
+            y+=self.stride
+        return final
     def description(self): # Provide String representation to store the model 
         pass 
 class ConvolutionalLayer():
-    def __init__(self, stride=1, padding = False):
-        self.__filters = []
+    def __init__(self, layer_size, filter_shape = (3,3) , stride=1, padding = False,activation = "relu"):
+        self.__filters = np.random.randint(0,100,(layer_size,filter_shape[0],filter_shape[1]))/100
+        self.activation = activations[activation]
         self.next = None 
         self.prev = None
         self.stride = stride
-    def forward(self,X):
-        pass
+    def forward(self,_3Dvolumes):
+        self.outputs = []
+        for volume in _3Dvolumes:
+            Convolutions = []
+            for Slice in volume:
+                for Filter in self.__filters: # NOTE: Is equivilant to querying each individual perceptron
+                    Convolutions.append(self.activation(self.Convolve(Slice,Filter)))
+            self.outputs.append(Convolutions)
     def backward(self,y):
         pass
-    def Convolve(self,img,filter):
+    def Convolve(self,img,_filter):
         k = _filter.shape
         offset = int(k[0]/2)
         x,y = offset,offset
-        #NOTE: These op counts are unchecked 
+        # NOTE: These op counts are unchecked 
         x_ops = (img.shape[0] - k[0] // self.stride) + 1 
         y_ops = (img.shape[1] - k[1] // self.stride) + 1
         final = np.zeros((x_ops,y_ops))
