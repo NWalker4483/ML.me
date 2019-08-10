@@ -18,6 +18,7 @@ for i in range(len(y)):
     
 net = NeuralNetwork()
 net.set_training_set(X[:10000],dataset[:10000])
+# net.add_input_layer()
 net.add_layer(16)
 net.add_layer(16)
 net.add_layer(10)

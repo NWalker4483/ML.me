@@ -53,3 +53,10 @@ class NeuralNetwork():
         out = self.forward(data)
         print(self.get_recall() * 100)
         self.losses.append(np.mean(np.square(labels - out)))
+class AutoEncoder(NeuralNetwork):
+  def __init__(self):
+    pass
+  def sample(self,n = 10):
+    for i in range(n):
+      pass
+    pass
