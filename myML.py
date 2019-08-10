@@ -21,15 +21,15 @@ class NeuralNetwork():
 
   def add_layer(self,size,activation="sigmoid"):
     self.__layers.append(Fully_Connected_Layer(self.__layers[-1].outputSize,size))
-    self.__layers[-2].next = self.__layers[-1]
-    self.__layers[-1].prev = self.__layers[-2]
+    self.__layers[-2]._next = self.__layers[-1]
+    self.__layers[-1]._prev = self.__layers[-2]
   def add(self,layer):
     self.__layers.append(layer)
     if len(self.__layers) == 1:
       pass
     else:
-      self.__layers[-1].prev = self.__layers[-2]
-      self.__layers[-2].next = self.__layers[-1]
+      self.__layers[-1]._prev = self.__layers[-2]
+      self.__layers[-2]._next = self.__layers[-1]
   def backward(self, y):
     for i in range(len(self.__layers))[::-1]:
       self.__layers[i].backward(y)

@@ -1,34 +1,40 @@
 from helpers import activations, activations_prime
 import numpy as np
-class Fully_Connected_Layer():
-  def __init__(self,input_size,layer_size,activation = "sigmoid"):
-    self.weights = np.random.randn(input_size,layer_size)
-    self.outputSize = layer_size
-    self.next = None 
-    self.prev = None 
-    self.activation = activations[activation]
-    self.activation_prime = activations_prime[activation]
+class Layer():
+    def __init__(self):
+        self._prev = None 
+        self._next = None 
+
     def prev(self):
-        if self.prev != None:
-            if self.prev.type == "Pooling":
-                return self.prev.prev
-        return self.prev
+        if self._prev != None:
+            if self._prev.type == "Pooling":
+                return self._prev.prev()
+        return self._prev
     def next(self):
-        if self.next != None:
-            if self.next.type == "Pooling":
-                return self.next.next
-        return self.next
+        if self._next != None:
+            if self._next.type == "Pooling":
+                return self._next.next()
+        return self._next
+    
+class Fully_Connected_Layer(Layer):
+    def __init__(self,input_size,layer_size,activation = "sigmoid"):
+        Layer.__init__(self)
+        self.type = "Dense"
+        self.weights = np.random.randn(input_size,layer_size)
+        self.outputSize = layer_size
+        self.activation = activations[activation]
+        self.activation_prime = activations_prime[activation]
     def forward(self,X):
-        if self.prev == None: 
+        if self._prev == None: 
             self.outputs = X
         else:
             self.unactivated_outputs = np.dot(X, self.weights) 
             self.outputs = self.activation(self.unactivated_outputs)
         return self.outputs
     def backward(self,y):
-        if self.prev == None:
+        if self._prev == None:
             return
-        if self.next == None:
+        if self._next == None:
             self.error = y - self.outputs # error in output
         else: 
             self.error = self.next().delta.dot(self.next().weights.T) # Represents the direction in which the weights of the current layer need to change in order to correct the error of the next forward layer 
@@ -39,11 +45,9 @@ class Fully_Connected_Layer():
         pass
 class PoolingLayer():
     def __init__(self,filter_shape=(2,2), stride=2, padding = False):
-        self.next = None
-        self.prev = None
+        Layer.__init__(self)
         self.stride = stride
         self.type = "Pooling"
-        pass
     def forward(self,_3Dvolumes):
         self.outputs = [] 
         for volume in _3Dvolumes:
@@ -82,26 +86,15 @@ class PoolingLayer():
             y+=self.stride
         return final
     def description(self): # Provide String representation to store the model 
-        pass 
-class ConvolutionalLayer():
+        return f"{self.type} {self.filter_shape} {self.stride}"
+class ConvolutionalLayer(Layer):
     def __init__(self, layer_size, filter_shape = (3,3) , stride=1, padding = False,activation = "relu"):
+        Layer.__init__(self)
         self.__filters = np.random.randn(layer_size,np.product(filter_shape))
         self.filter_shape = filter_shape
         self.activation = activations[activation]
-        self.next = None 
-        self.prev = None
         self.stride = stride
         self.type = "Conv"
-    def prev(self):
-        if self.prev != None:
-            if self.prev.type == "Pooling":
-                return self.prev.prev
-        return self.prev
-    def next(self):
-        if self.next != None:
-            if self.next.type == "Pooling":
-                return self.next.next
-        return self.next
     def forward(self,_3Dvolumes):
         self.outputs = []
         for volume in _3Dvolumes:
