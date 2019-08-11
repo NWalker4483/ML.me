@@ -3,6 +3,7 @@ import numpy as np
 import time
 from helpers import flatten_img_list
 import json
+import pickle  
 class NeuralNetwork():
   def __init__(self):
     self._layers = []
@@ -11,11 +12,11 @@ class NeuralNetwork():
     self.training_data = None
     self.training_labels = None
   def save(self,filename):
-    for layer in self.__layers:
-      pass
-    pass
+    filehandler = open(filename, 'wb+') 
+    pickle.dump(self, filehandler)
   def load(self,filename):
-    pass
+    filehandler = open(filename, 'rb') 
+    return pickle.load(filehandler)
   def forward(self, X): 
     output = X
     for i in range(len(self._layers)):
@@ -29,7 +30,7 @@ class NeuralNetwork():
     return X
   def set_training_set(self,X,y):
     self.training_data = self.__prep_data(X)
-    self.training_labels = self.__prep_data(y) 
+    self.training_labels = y#self.__prep_data(y) 
   def add(self,layer):
     self._layers.append(layer)
     if len(self._layers) == 1:

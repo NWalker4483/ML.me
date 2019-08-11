@@ -25,7 +25,9 @@ net.add(Fully_Connected_Layer(16,784))
 
 net.set_training_set(X[:3000],X[:3000])
 #net.encode(7)
-net.train(epochs = 5000,batch_size = 200)
+net.train(epochs = 1,batch_size = 200)
+net.save("myML.model")
+net.load("myML.model")
 
 import cv2
 for img in [i.reshape(28,28) for i in net.sample()]:
@@ -37,5 +39,3 @@ for img in [i.reshape(28,28) for i in net.sample()]:
 plt.plot(range(len(net.losses)),net.losses)
 plt.title("Loss vs. Epochs")
 plt.show()
-
-print(net.get_acc(X[10000:16500],dataset[10000:16500]) * 100)
