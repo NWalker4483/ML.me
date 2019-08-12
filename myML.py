@@ -8,7 +8,6 @@ class NeuralNetwork():
   def __init__(self):
     self._layers = []
     self.losses = []
-
     self.training_data = None
     self.training_labels = None
   def save(self,filename):
@@ -22,14 +21,8 @@ class NeuralNetwork():
     for i in range(len(self._layers)):
       output = self._layers[i].forward(output)
     return output
-  def __prep_data(self,X):
-    if self._layers[0].type == "Dense":
-      X = flatten_img_list(X)
-    else:
-      X = [[i] for i in X]
-    return X
   def set_training_set(self,X,y):
-    self.training_data = self.__prep_data(X)
+    self.training_data = X
     self.training_labels = y#self.__prep_data(y) 
   def add(self,layer):
     self._layers.append(layer)
@@ -40,6 +33,8 @@ class NeuralNetwork():
       self._layers[-2]._next = self._layers[-1]
   def backward(self, y):
     for i in range(len(self._layers))[::-1]:
+      # Todo skip Pooling Layers
+      # TODO: Add property storage in UnTrained Layers 
       self._layers[i].backward(y)
   # NOTE: These Calculations are too domain specific
   def get_acc(self,X,y):

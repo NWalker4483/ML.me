@@ -3,24 +3,33 @@ from myML import NeuralNetwork ,AutoEncoder
 from layers import ConvolutionalLayer, PoolingLayer, Fully_Connected_Layer
 from keras.datasets import mnist
 import matplotlib.pyplot as plt
+from helpers import flatten_img_list
 
 #  map to 0 - 1 
-(X, y), (x2, y2) = mnist.load_data()
+(x1, y1), (x2, y2) = mnist.load_data()
 print("But not really!!!!")
 
-X = X/255
-X = [X[i] for i in range(len(X)) if y[i] == 7]
+X = x1/255
+X = [X[i] for i in range(len(X)) if y1[i] == 7]
 
 net = AutoEncoder()
 net.add(Fully_Connected_Layer(0,784))
-net.add(Fully_Connected_Layer(784,16))
-net.add(Fully_Connected_Layer(16,784))
+net.add(Fully_Connected_Layer(784,32))
+net.add(Fully_Connected_Layer(32,8))
+net.add(Fully_Connected_Layer(8,32))
+net.add(Fully_Connected_Layer(32,784))
 
-net.set_training_set(X[:3000],X[:3000])
+X = flatten_img_list(X[:10000])
+net.set_training_set(X,X)
 #net.encode(7)
-net.train(epochs = 1000,batch_size = 200)
-
+try:
+    net.train(epochs = 5000,batch_size = 200)
+except KeyboardInterrupt as e:
+    net.save("ae.failed.model")
+finally:
+    net.save("ae.model")
 import cv2
+
 for img in [i.reshape(28,28) for i in net.sample()]:
   img = cv2.resize(img, (300,300))
   cv2.imshow("",img)

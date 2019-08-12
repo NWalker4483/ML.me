@@ -26,9 +26,8 @@ net.add(Fully_Connected_Layer(16,16))
 net.add(Fully_Connected_Layer(16,10))
 
 net.set_training_set(X[:3000],Y[:3000])
-#net.encode(7)
-net.train(epochs = 100,batch_size = 200)
-net.save("mayML.model")
+net.train(epochs = 1000,batch_size = 200)
+net.save("MLP.model")
 
 plt.plot(range(len(net.losses)),net.losses)
 plt.title("Loss vs. Epochs")

@@ -28,10 +28,7 @@ class Fully_Connected_Layer(Layer):
         self.bias = np.zeros(layer_size)
         self.weights = np.random.randn(input_size,layer_size)
         self.outputSize = layer_size
-    def load_weights(self,weights):
-        self.weights = weights
-        self.outputSize = weights.shape[1]
-        pass
+
     def forward(self,X): 
         if self._prev == None: 
             self.outputs = X
@@ -51,16 +48,21 @@ class Fully_Connected_Layer(Layer):
             self.error = self.next().delta.dot(self.next().weights.T) # Represents the direction in which the weights of the current layer need to change in order to correct the error of the next forward layer 
         self.delta = self.error*self.activation_prime(self.outputs)
         # TODO: Pass in learning rate from model  
-        if self.prev().type == "Conv": #Bad
-            self.weights += self.prev().outputVector().T.dot(self.delta) * .001  
-        else:
-            self.weights += self.prev().outputs.T.dot(self.delta) * .001  
+        self.weights += self.prev().outputs.T.dot(self.delta) * .001  
     def description(self): # Provide String representation to store the model 
         desc = {}
         desc["type"] = self.type
         desc["size"] = self.outputSize
         desc["weights"] = json.dumps(self.weights.tolist())
         return desc
+class FlattenLayer(Layer):
+    def __init__(self):
+        Layer.__init__(self,"Flatten")
+        pass
+    def forward(self):
+        pass
+    def backward(self):
+        pass
 class PoolingLayer(Layer):
     def __init__(self,filter_shape=(2,2), stride=2, padding = False):
         Layer.__init__(self,"Pooling")
@@ -97,6 +99,7 @@ class PoolingLayer(Layer):
 class ConvolutionalLayer(Layer):
     def __init__(self, layer_size, filter_shape = (3,3) , stride=1, padding = False,activation = "relu"):
         Layer.__init__(self,"Conv",activation)
+        self.bias = None 
         self.weights = np.random.randn(layer_size,np.product(filter_shape))
         self.filter_shape = filter_shape
         self.stride = stride
@@ -111,14 +114,13 @@ class ConvolutionalLayer(Layer):
             self.outputs.append(Convolutions)
         self.outputs = np.array(self.outputs)
         return self.outputs
-    def outputVector(self):
-        outs = []
-        for volume in self.outputs:
-            outs.append(flatten_img_list(volume).flatten())
-        return np.array(outs)
     def backward(self,y): # Bad
-        if self.prev() == None:
-            return
+        for volume in self.outputs:
+            for img in volume:
+                self.Convolve(img,self.next().delta)
+
+
+
         if self.next() == None:
             self.error = y - self.outputs # error in output
         else: 
