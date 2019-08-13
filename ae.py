@@ -1,6 +1,6 @@
 import numpy as np
 from myML import NeuralNetwork ,AutoEncoder
-from layers import ConvolutionalLayer, PoolingLayer, Fully_Connected_Layer
+from layers import ConvolutionalLayer, PoolingLayer, Dense
 from keras.datasets import mnist
 import matplotlib.pyplot as plt
 from helpers import flatten_img_list
@@ -13,11 +13,11 @@ X = x1/255
 X = [X[i] for i in range(len(X)) if y1[i] == 7]
 
 net = AutoEncoder()
-net.add(Fully_Connected_Layer(0,784))
-net.add(Fully_Connected_Layer(784,32))
-net.add(Fully_Connected_Layer(32,8))
-net.add(Fully_Connected_Layer(8,32))
-net.add(Fully_Connected_Layer(32,784))
+net.add(Dense(0,784))
+net.add(Dense(784,32))
+net.add(Dense(32,8))
+net.add(Dense(8,32))
+net.add(Dense(32,784))
 
 X = flatten_img_list(X[:10000])
 net.set_training_set(X,X)

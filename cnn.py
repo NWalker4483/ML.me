@@ -1,7 +1,7 @@
 
 import numpy as np
 from myML import NeuralNetwork
-from layers import ConvolutionalLayer, PoolingLayer, Fully_Connected_Layer
+from layers import ConvolutionalLayer, PoolingLayer, Dense
 from helpers import flatten_img_list
 
 import matplotlib.pyplot as plt
@@ -27,9 +27,9 @@ net.add(ConvolutionalLayer(2,(3,3),stride=1))
 
 # TransformingLayer()
 
-net.add(Fully_Connected_Layer(11616,120)),
-net.add(Fully_Connected_Layer(120,84))
-net.add(Fully_Connected_Layer(84,10))
+net.add(Dense(11616,120)),
+net.add(Dense(120,84))
+net.add(Dense(84,10))
 
 net.set_training_set(X[:3000],X[:3000])
 # NOTE: Only Increase epochs after successfully designed

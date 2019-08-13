@@ -1,4 +1,4 @@
-from layers import Fully_Connected_Layer
+from layers import Dense
 import numpy as np 
 import time
 from helpers import flatten_img_list
@@ -8,8 +8,8 @@ class NeuralNetwork():
   def __init__(self):
     self._layers = []
     self.losses = []
-    self.training_data = None
-    self.training_labels = None
+    # self.training_data = None
+    # self.training_labels = None
   def save(self,filename):
     filehandler = open(filename, 'wb+') 
     pickle.dump(self, filehandler)
@@ -27,10 +27,12 @@ class NeuralNetwork():
   def add(self,layer):
     self._layers.append(layer)
     if len(self._layers) == 1:
+      self._layers[-1].init(0)
       pass
     else:
       self._layers[-1]._prev = self._layers[-2]
       self._layers[-2]._next = self._layers[-1]
+      self._layers[-1].init(self._layers[-2].outputSize)
   def backward(self, y):
     for i in range(len(self._layers))[::-1]:
       # Todo skip Pooling Layers
@@ -83,15 +85,29 @@ class AutoEncoder(NeuralNetwork):
       encodings.append(data)
     return np.array(encodings)
   def decode(self,X):
-    pass
-  def sample(self,n = 10):
     if self.Bottleneck == None:
       self.Bottleneck = min(self._layers, key = lambda x: x.outputSize)
     samples = []
-    for data in np.random.rand(n,self.Bottleneck.outputSize):
+    for data in X:
       layer = self.Bottleneck.next()
       while layer != None:
         data = layer.forward(data)
         layer = layer.next()
       samples.append(data)
     return np.array(samples)
+  def sample(self,n = 10):
+    return self.decode(np.random.normal(0,1,(n,self.Bottleneck.outputSize)))
+class GAN():
+  def __init__(self, Generator, Descriminator):
+    self.Generator = Generator
+    self.Descriminator = Descriminator
+    pass
+  def set_training_data():
+    pass
+  def train(self, epochs = 1000,batch_size = 32):
+    for _ in range(epochs):
+      gens = self.Generator.sample(batch_size)
+      self.Descriminator.train(np.array(gens, [[0] for _ in range(batch_size)] ))
+      pass
+    #print ("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss[0], 100*d_loss[1], g_loss))
+    pass

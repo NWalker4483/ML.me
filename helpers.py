@@ -15,3 +15,5 @@ activations_prime = {"relu":ReLUPrime,"sigmoid":sigmoidPrime}
 def flatten_img_list(x):
   x = np.array(x)
   return x.reshape((x.shape[0],x.shape[1] * x.shape[2]))
+def flip(a):
+    return np.fliplr(np.flipud(a))

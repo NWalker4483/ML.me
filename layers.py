@@ -1,5 +1,6 @@
 from helpers import activations, activations_prime, flatten_img_list
 import numpy as np
+import helpers as help
 import json
 class Layer():
     def __init__(self,Type,activation="sigmoid"):
@@ -22,13 +23,13 @@ class Layer():
     def __len__(self):
         return len(self.weights)
     
-class Fully_Connected_Layer(Layer):
-    def __init__(self,input_size,layer_size,activation = "sigmoid"):
+class Dense(Layer):
+    def __init__(self,layer_size,activation = "sigmoid"):
         Layer.__init__(self, "Dense")
         self.bias = np.zeros(layer_size)
-        self.weights = np.random.randn(input_size,layer_size)
         self.outputSize = layer_size
-
+    def init(self,input_size):
+        self.weights = np.random.randn(input_size,self.outputSize)
     def forward(self,X): 
         if self._prev == None: 
             self.outputs = X
@@ -57,17 +58,19 @@ class Fully_Connected_Layer(Layer):
         return desc
 class FlattenLayer(Layer):
     def __init__(self):
-        Layer.__init__(self,"Flatten")
+        Layer.__init__(self,"Flattening")
         pass
     def forward(self):
         pass
     def backward(self):
         pass
-class PoolingLayer(Layer):
+class PoolingLayer(Layer): # Should act as a preserver of weights MAYBE NOT THOUGH 
     def __init__(self,filter_shape=(2,2), stride=2, padding = False):
         Layer.__init__(self,"Pooling")
         self.stride = stride
         self.filter_shape = filter_shape
+        self.max_maps = None
+        self.deltas = None 
     def backward(self, y): # Bad
         pass
     def forward(self,_3Dvolumes): # Good 
@@ -75,11 +78,11 @@ class PoolingLayer(Layer):
         for volume in _3Dvolumes:
             Pools = []
             for Slice in volume:
-                Pools.append(self.MaxPooling(Slice))
+                Pools.append(self.MaxPooling(Slice,True))
             outputs.append(Pools)
         self.outputs = np.array(outputs)
         return self.outputs
-    def MaxPooling(self,img): # Good // Parallelize
+    def MaxPooling(self,img,Map = False): # Good // Parallelize
         k = self.filter_shape
         offset = int(k[0]/2)
         x,y = 0, 0  # offset,offset
@@ -87,9 +90,12 @@ class PoolingLayer(Layer):
         x_ops = ((img.shape[0] - k[0])// self.stride) + 1 
         y_ops = ((img.shape[1] - k[1])// self.stride) + 1
         final = np.zeros((x_ops,y_ops))
+        self.max_map = np.zeros((x_ops,y_ops))
         for _y in range(y_ops):
             for _x in range(x_ops):
-                final[_y][_x] = img[y:y+k[0]][:,x:x+k[1]].max()
+                pnt = np.argmax(img[y:y+k[0]][:,x:x+k[1]])
+                Map[_y][_x] = (y + (pnt // k[0]), x + (pnt % 3))
+                final[_y][_x] = 0
                 x += self.stride
             x = 0 
             y += self.stride
@@ -118,9 +124,7 @@ class ConvolutionalLayer(Layer):
         for volume in self.outputs:
             for img in volume:
                 self.Convolve(img,self.next().delta)
-
-
-
+                #help.flip(Filter)
         if self.next() == None:
             self.error = y - self.outputs # error in output
         else: 
