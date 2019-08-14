@@ -7,8 +7,8 @@ class Layer():
         self.type = Type
         self._prev = None 
         self._next = None 
-        self.activation = activations[activation]
-        self.activation_prime = activations[activation]
+        self.activation = help.activations[activation]
+        self.activation_prime = help.activations[activation]
 
     def prev(self):
         if self._prev != None:
@@ -21,10 +21,9 @@ class Layer():
                 return self._next.next()
         return self._next
     def __len__(self):
-        return len(self.weights)
-    
+        return len(self.weights)   
 class Dense(Layer):
-    def __init__(self,layer_size,activation = "sigmoid"):
+    def __init__(self,layer_size,activation = "relu"):
         Layer.__init__(self, "Dense")
         self.bias = np.zeros(layer_size)
         self.outputSize = layer_size
@@ -34,8 +33,6 @@ class Dense(Layer):
         if self._prev == None: 
             self.outputs = X
         else:
-            if self.prev().type in ["Conv","Pooling"]: #Bad
-                X = self.prev().outputVector()
             self.unactivated_outputs = np.dot(X, self.weights) 
             self.unactivated_outputs += self.bias
             self.outputs = self.activation(self.unactivated_outputs)
@@ -60,10 +57,19 @@ class FlattenLayer(Layer):
     def __init__(self):
         Layer.__init__(self,"Flattening")
         pass
-    def forward(self):
-        pass
-    def backward(self):
-        pass
+    def init(self,X):
+        self.outputSize = np.prod(X)
+        self.img_shape = None 
+    def forward(self,x):
+        #Reshape images from 
+        self.outputs = x.reshape((x.shape[0],x.shape[1] * x.shape[2] * x.shape[3]))
+        return self.outputs
+    def backward(self,y):
+        self.error = self.next().delta.dot(self.next().weights.T) # Represents the direction in which the weights of the current layer need to change in order to correct the error of the next forward layer 
+        self.delta = self.error*self.activation_prime(self.outputs)
+        self.delta = self.delta.reshape((self.delta.shape[0],self.prev().outputSize[0],self.prev().outputSize[1],self.prev().outputSize[2]))
+        # Reshapes Deltas of Weights
+    
 class PoolingLayer(Layer): # Should act as a preserver of weights MAYBE NOT THOUGH 
     def __init__(self,filter_shape=(2,2), stride=2, padding = False):
         Layer.__init__(self,"Pooling")
@@ -109,33 +115,36 @@ class ConvolutionalLayer(Layer):
         self.weights = np.random.randn(layer_size,np.product(filter_shape))
         self.filter_shape = filter_shape
         self.stride = stride
-    def forward(self,_3Dvolumes):
+        self.outputSize = (layer_size,26,26)
+    def init(self,X):
+        pass
+    def forward(self,_3Dvolumes): # Takes input in the form of 
         self.outputs = []
         for volume in _3Dvolumes:
             Convolutions = []
             for Slice in volume:
-                for Filter in self.weights: # NOTE: Is equivilant to querying each individual perceptron
+                for Filter in self.weights:
                     Filter = Filter.reshape(self.filter_shape)
                     Convolutions.append(self.activation(self.Convolve(Slice,Filter)))
             self.outputs.append(Convolutions)
         self.outputs = np.array(self.outputs)
         return self.outputs
     def backward(self,y): # Bad
-        for volume in self.outputs:
-            for img in volume:
-                self.Convolve(img,self.next().delta)
-                #help.flip(Filter)
-        if self.next() == None:
-            self.error = y - self.outputs # error in output
-        else: 
+        new_filters = []
+        #print(self.weights.shape,self.next().delta.shape)
+        for Filter in self.weights:
+            convs = []
             self.error = self.next().delta.dot(self.next().weights.T) # Represents the direction in which the weights of the current layer need to change in order to correct the error of the next forward layer 
-        self.delta = self.error*self.activation_prime(self.outputVector())
-        # TODO: Pass in learning rate from model  
-        if self.prev().type == "Conv":
-            self.weights += self.prev().outputVector().T.dot(self.delta) * .001  
-        else:
-            self.weights += self.prev().outputs.T.dot(self.delta) * .001  
-    def Convolve(self,img,_filter):
+            self.delta = self.error*self.activation_prime(self.outputs)
+            for deltas in self.next().delta:
+                for delta in deltas:
+                    error , convset = self.Convolve(delta,Filter.reshape(self.filter_shape),store=True)
+                    #print(a.shape)
+                    convs += convset
+            new_filters.append(np.average(convs,0).flatten())
+        self.weights = np.array(new_filters)
+        #print(self.weights[0])
+    def Convolve(self,img,_filter,store = False):
         k = _filter.shape
         offset = int(k[0]/2)
         x,y = offset,offset
@@ -143,12 +152,17 @@ class ConvolutionalLayer(Layer):
         x_ops = (img.shape[0] - k[0] // self.stride) + 1 
         y_ops = (img.shape[1] - k[1] // self.stride) + 1
         final = np.zeros((x_ops,y_ops))
+        convs = []
         for _y in range(y_ops):
             for _x in range(x_ops):
-                final[_y][_x] = sum(sum(_filter * img[y-offset:y+offset+1][:,x-offset:x+offset+1]))
+                conv = _filter * img[y-offset:y+offset+1][:,x-offset:x+offset+1]
+                final[_y][_x] = sum(sum(conv))
+                convs.append(conv)
                 x+=self.stride
             x = offset
             y+=self.stride
+        if store:
+            return final, convs
         return final
     def description(self): # Provide String representation to store the model 
         pass

@@ -11,19 +11,20 @@ print("But not really!!!!")
 
 X = x1/255
 X = [X[i] for i in range(len(X)) if y1[i] == 7]
+#X = flatten_img_list(X)
 
 net = AutoEncoder()
-net.add(Dense(0,784))
-net.add(Dense(784,32))
-net.add(Dense(32,8))
-net.add(Dense(8,32))
-net.add(Dense(32,784))
+net.add(Dense(784))
+net.add(Dense(32))
+net.add(Dense(8))
+net.add(Dense(32))
+net.add(Dense(784))
 
-X = flatten_img_list(X[:10000])
+X = flatten_img_list(X[:30000])
 net.set_training_set(X,X)
 #net.encode(7)
 try:
-    net.train(epochs = 5000,batch_size = 200)
+    net.train(epochs = 500,batch_size = 200)
 except KeyboardInterrupt as e:
     net.save("ae.failed.model")
 finally:

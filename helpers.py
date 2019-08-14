@@ -9,11 +9,12 @@ def sigmoidPrime(s):
     return s * (1 - s)
 def softMax():
     pass
-activations = {"relu":ReLU,"sigmoid":sigmoid,"tanh":np.tanh,"threshold":0}
+activations = {"relu":ReLU,"sigmoid":sigmoid,"tanh":np.tanh,"threshold":0,"softmax":None}
 activations_prime = {"relu":ReLUPrime,"sigmoid":sigmoidPrime}
 
 def flatten_img_list(x):
   x = np.array(x)
+
   return x.reshape((x.shape[0],x.shape[1] * x.shape[2]))
 def flip(a):
     return np.fliplr(np.flipud(a))

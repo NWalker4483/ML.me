@@ -40,15 +40,13 @@ class NeuralNetwork():
       self._layers[i].backward(y)
   # NOTE: These Calculations are too domain specific
   def get_acc(self,X,y):
-    out = self.forward(self.__prep_data(X))
+    out = self.forward(X)
     right = sum([np.argmax(out[i]) == np.argmax(y[i]) for i in range(len(out))])
     return right/len(y)
-  def get_recall(self,out):
+  def get_recall(self):
     out = self.forward(self.training_data)
     a = sum([np.argmax(out[i]) == np.argmax(self.training_labels[i]) for i in range(len(out))])
     return a / len(self.training_data)
-  def last_layer_size():
-    pass
   def train (self,epochs = 1000, batch_size = 32, resolution = 10):
     start_time = time.time()
     for i in range(epochs):
@@ -96,6 +94,8 @@ class AutoEncoder(NeuralNetwork):
       samples.append(data)
     return np.array(samples)
   def sample(self,n = 10):
+    if self.Bottleneck == None:
+      self.Bottleneck = min(self._layers, key = lambda x: x.outputSize)
     return self.decode(np.random.normal(0,1,(n,self.Bottleneck.outputSize)))
 class GAN():
   def __init__(self, Generator, Descriminator):
