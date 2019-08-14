@@ -18,7 +18,8 @@ if train:
         dataset[i][y[i]] = 1
     X = [[X[i]] for i in range(len(X))]
     net = NeuralNetwork()
-    net.add(ConvolutionalLayer(6,(3,3),stride=1)) # 6
+    net.add(ConvolutionalLayer(2,(3,3),stride=1,input_shape=(28,28))) # 6
+    net.add(ConvolutionalLayer(2,(3,3),stride=1)) # 6
     #net.add(PoolingLayer((2,2),2))
     #net.add(ConvolutionalLayer(16,(3,3),stride=1))
     #net.add(PoolingLayer((2,2),2))

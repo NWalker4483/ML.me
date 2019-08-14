@@ -68,6 +68,7 @@ class FlattenLayer(Layer):
         self.error = self.next().delta.dot(self.next().weights.T) # Represents the direction in which the weights of the current layer need to change in order to correct the error of the next forward layer 
         self.delta = self.error*self.activation_prime(self.outputs)
         self.delta = self.delta.reshape((self.delta.shape[0],self.prev().outputSize[0],self.prev().outputSize[1],self.prev().outputSize[2]))
+        print(self.delta.shape)
         # Reshapes Deltas of Weights
     
 class PoolingLayer(Layer): # Should act as a preserver of weights MAYBE NOT THOUGH 
@@ -109,14 +110,23 @@ class PoolingLayer(Layer): # Should act as a preserver of weights MAYBE NOT THOU
     def description(self): # Provide String representation to store the model 
         return f"{self.type} {self.filter_shape} {self.stride}"
 class ConvolutionalLayer(Layer):
-    def __init__(self, layer_size, filter_shape = (3,3) , stride=1, padding = False,activation = "relu"):
+    def __init__(self, layer_size, filter_shape = (3,3) , stride=1, padding = False,activation = "relu",input_shape=(-1,-1)):
         Layer.__init__(self,"Conv",activation)
         self.bias = None 
         self.weights = np.random.randn(layer_size,np.product(filter_shape))
         self.filter_shape = filter_shape
         self.stride = stride
-        self.outputSize = (layer_size,26,26)
+        self.layer_size = layer_size
+        x_ops = (input_shape[0] - filter_shape[0] // self.stride) + 1 
+        y_ops = (input_shape[1] - filter_shape[1] // self.stride) + 1
+        self.outputSize = (self.layer_size,) + (x_ops,y_ops)
     def init(self,X):
+        if X == 0:
+            return
+        x_ops = (X[1] - self.filter_shape[0] // self.stride) + 1 
+        y_ops = (X[2] - self.filter_shape[1] // self.stride) + 1
+        self.outputSize = (X[0] * self.layer_size,) + (x_ops,y_ops)
+        print(self.outputSize)
         pass
     def forward(self,_3Dvolumes): # Takes input in the form of 
         self.outputs = []
@@ -131,19 +141,19 @@ class ConvolutionalLayer(Layer):
         return self.outputs
     def backward(self,y): # Bad
         new_filters = []
-        #print(self.weights.shape,self.next().delta.shape)
+        new_deltas = []
         for Filter in self.weights:
-            convs = []
-            self.error = self.next().delta.dot(self.next().weights.T) # Represents the direction in which the weights of the current layer need to change in order to correct the error of the next forward layer 
-            self.delta = self.error*self.activation_prime(self.outputs)
-            for deltas in self.next().delta:
-                for delta in deltas:
-                    error , convset = self.Convolve(delta,Filter.reshape(self.filter_shape),store=True)
-                    #print(a.shape)
+            for volume in self.next().delta:
+                convs = []
+                Delta_Convolutions = []
+                for delta in volume:
+                    delta_in , convset = self.Convolve(delta,Filter.reshape(self.filter_shape),store=True)
+                    Delta_Convolutions.append(delta_in)
                     convs += convset
+            new_deltas.append(np.average(Delta_Convolutions,0))
             new_filters.append(np.average(convs,0).flatten())
         self.weights = np.array(new_filters)
-        #print(self.weights[0])
+        self.delta = np.array(new_deltas)
     def Convolve(self,img,_filter,store = False):
         k = _filter.shape
         offset = int(k[0]/2)
