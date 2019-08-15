@@ -7,8 +7,8 @@ def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 def sigmoidPrime(s):
     return s * (1 - s)
-def softMax():
-    pass
+def softMax(x):
+  return np.exp(x)/sum(np.exp(x))
 activations = {"relu":ReLU,"sigmoid":sigmoid,"tanh":np.tanh,"threshold":0,"softmax":None}
 activations_prime = {"relu":ReLUPrime,"sigmoid":sigmoidPrime}
 

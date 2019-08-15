@@ -68,7 +68,7 @@ class FlattenLayer(Layer):
         self.error = self.next().delta.dot(self.next().weights.T) # Represents the direction in which the weights of the current layer need to change in order to correct the error of the next forward layer 
         self.delta = self.error*self.activation_prime(self.outputs)
         self.delta = self.delta.reshape((self.delta.shape[0],self.prev().outputSize[0],self.prev().outputSize[1],self.prev().outputSize[2]))
-        print(self.delta.shape)
+        
         # Reshapes Deltas of Weights
     
 class PoolingLayer(Layer): # Should act as a preserver of weights MAYBE NOT THOUGH 
@@ -126,7 +126,6 @@ class ConvolutionalLayer(Layer):
         x_ops = (X[1] - self.filter_shape[0] // self.stride) + 1 
         y_ops = (X[2] - self.filter_shape[1] // self.stride) + 1
         self.outputSize = (X[0] * self.layer_size,) + (x_ops,y_ops)
-        print(self.outputSize)
         pass
     def forward(self,_3Dvolumes): # Takes input in the form of 
         self.outputs = []
@@ -141,19 +140,24 @@ class ConvolutionalLayer(Layer):
         return self.outputs
     def backward(self,y): # Bad
         new_filters = []
-        new_deltas = []
-        for Filter in self.weights:
-            for volume in self.next().delta:
+        new_deltas = [[[] for _ in range(len(self.weights))] for i in range(len(self.next().delta))]
+        for i in range(len(self.weights)):
+            Filter = self.weights[i]
+            new_deltas2 = [] 
+            for j in range(len(self.next().delta)):
+                volume = self.next().delta[j]
                 convs = []
                 Delta_Convolutions = []
                 for delta in volume:
-                    delta_in , convset = self.Convolve(delta,Filter.reshape(self.filter_shape),store=True)
+                    delta_in, convset = self.Convolve(delta,Filter.reshape(self.filter_shape),store=True)
                     Delta_Convolutions.append(delta_in)
                     convs += convset
-            new_deltas.append(np.average(Delta_Convolutions,0))
+                new_deltas[j][i] = np.average(Delta_Convolutions,0)
+            #new_deltas.append(new_deltas2)
             new_filters.append(np.average(convs,0).flatten())
         self.weights = np.array(new_filters)
         self.delta = np.array(new_deltas)
+        #print(self.next().delta.shape,self.delta.shape)
     def Convolve(self,img,_filter,store = False):
         k = _filter.shape
         offset = int(k[0]/2)

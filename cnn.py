@@ -19,7 +19,7 @@ if train:
     X = [[X[i]] for i in range(len(X))]
     net = NeuralNetwork()
     net.add(ConvolutionalLayer(2,(3,3),stride=1,input_shape=(28,28))) # 6
-    net.add(ConvolutionalLayer(2,(3,3),stride=1)) # 6
+    net.add(ConvolutionalLayer(3,(3,3),stride=1)) # 6
     #net.add(PoolingLayer((2,2),2))
     #net.add(ConvolutionalLayer(16,(3,3),stride=1))
     #net.add(PoolingLayer((2,2),2))
@@ -27,11 +27,14 @@ if train:
     #net.add(Dense(120))
     #net.add(Dense(84))
     net.add(Dense(10))#,"softmax"))
-    net.set_training_set(X[:200],dataset[:200])
+    net.set_training_set(X[:2000],dataset[:2000])
     # NOTE: Only Increase epochs after successfully designed
-    net.train(epochs = 100, batch_size = 50, resolution = 10)
-
-    net.save("CNN.model")
+    try:
+        net.train(epochs = 50, batch_size = 45, resolution = 1)
+    except KeyboardInterrupt as e:
+        net.save("CNN.failed.model")
+    finally:
+        net.save("CNN.model")
 else:
     net = NeuralNetwork().load("CNN.model") 
 print(net.get_recall())
