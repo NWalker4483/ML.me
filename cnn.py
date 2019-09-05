@@ -25,7 +25,7 @@ if train:
     #net.add(PoolingLayer((2,2),2))
     net.add(FlattenLayer())
     #net.add(Dense(120))
-    #net.add(Dense(84))
+    net.add(Dense(84))
     net.add(Dense(10))#,"softmax"))
     net.set_training_set(X[:2000],dataset[:2000])
     # NOTE: Only Increase epochs after successfully designed

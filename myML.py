@@ -30,14 +30,13 @@ class NeuralNetwork():
       self._layers[-1].init(0)
       pass
     else:
-      self._layers[-1]._prev = self._layers[-2]
       self._layers[-2]._next = self._layers[-1]
+      self._layers[-1]._prev = self._layers[-2]
       self._layers[-1].init(self._layers[-2].outputSize)
   def backward(self, y):
-    for i in range(len(self._layers))[::-1]:
-      # Todo skip Pooling Layers
-      # TODO: Add property storage in UnTrained Layers 
+    for i in range(len(self._layers))[::-1]:# TODO: Add property storage in UnTrained Layers 
       self._layers[i].backward(y)
+
   # NOTE: These Calculations are too domain specific
   def get_acc(self,X,y):
     out = self.forward(X)
@@ -56,7 +55,9 @@ class NeuralNetwork():
       out = self.forward(data)
       self.backward(labels)
       if i % resolution == 0:
-        self.losses.append(np.mean(np.square((labels - out))))
+        #NOTE: Starckly increases train time 
+        print(self.get_recall() * 100)
+        self.losses.append(np.mean(np.square(labels - out)))
         print(f"@ Epoch: {i} of {epochs}\n\t Loss: {self.losses[-1]}")
     Seconds = int(time.time() - start_time)
     Minutes = Seconds // 60

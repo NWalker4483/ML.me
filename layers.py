@@ -1,4 +1,4 @@
-from helpers import activations, activations_prime, flatten_img_list
+
 import numpy as np
 import helpers as help
 import json
@@ -23,7 +23,7 @@ class Layer():
     def __len__(self):
         return len(self.weights)   
 class Dense(Layer):
-    def __init__(self,layer_size,activation = "relu"):
+    def __init__(self,layer_size,activation = "sigmoid"):
         Layer.__init__(self, "Dense")
         self.bias = np.zeros(layer_size)
         self.outputSize = layer_size
@@ -34,7 +34,7 @@ class Dense(Layer):
             self.outputs = X
         else:
             self.unactivated_outputs = np.dot(X, self.weights) 
-            self.unactivated_outputs += self.bias
+            self.unactivated_outputs += 0 #self.bias
             self.outputs = self.activation(self.unactivated_outputs)
         return self.outputs
     def backward(self,y):
