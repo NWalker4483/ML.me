@@ -34,7 +34,7 @@ class Dense(Layer):
             self.outputs = X
         else:
             self.unactivated_outputs = np.dot(X, self.weights) 
-            self.unactivated_outputs += 0 #self.bias
+            self.unactivated_outputs += self.bias
             self.outputs = self.activation(self.unactivated_outputs)
         return self.outputs
     def backward(self,y):
@@ -108,7 +108,7 @@ class PoolingLayer(Layer): # Should act as a preserver of weights MAYBE NOT THOU
             y += self.stride
         return final
     def description(self): # Provide String representation to store the model 
-        return f"{self.type} {self.filter_shape} {self.stride}"
+        pass#return f"{self.type} {self.filter_shape} {self.stride}"
 class ConvolutionalLayer(Layer):
     def __init__(self, layer_size, filter_shape = (3,3) , stride=1, padding = False,activation = "relu",input_shape=(-1,-1)):
         Layer.__init__(self,"Conv",activation)

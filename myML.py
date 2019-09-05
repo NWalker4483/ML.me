@@ -49,23 +49,23 @@ class NeuralNetwork():
   def train (self,epochs = 1000, batch_size = 32, resolution = 10):
     start_time = time.time()
     for i in range(epochs):
-      batch = np.random.choice(range(len(self.training_data)),batch_size)
-      data = np.array([self.training_data[i] for i in batch])
-      labels = np.array([self.training_labels[i] for i in batch])
+      batch = np.random.choice(len(self.training_data),batch_size)
+      data = np.array([self.training_data[y] for y in batch])
+      labels = np.array([self.training_labels[t] for t in batch])
       out = self.forward(data)
       self.backward(labels)
       if i % resolution == 0:
         #NOTE: Starckly increases train time 
         print(self.get_recall() * 100)
         self.losses.append(np.mean(np.square(labels - out)))
-        print(f"@ Epoch: {i} of {epochs}\n\t Loss: {self.losses[-1]}")
+        print("@ Epoch: {} of {}\n\t Loss: {}".format(i,epochs,self.losses[-1]))
     Seconds = int(time.time() - start_time)
     Minutes = Seconds // 60
     Seconds -= Minutes * 60
 
     Hours = Minutes // 60
     Minutes -= Hours * 60
-    print(f"Total Training Time {Hours} Hours {Minutes} Minutes {Seconds} Seconds")
+    print("Total Training Time {} Hours {} Minutes {} Seconds".format(Hours,Minutes,Seconds))
 class AutoEncoder(NeuralNetwork):
   def __init__(self):
     NeuralNetwork.__init__(self)
