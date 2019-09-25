@@ -1,7 +1,7 @@
-from layers import Dense
+from ML_me.layers import Dense
 import numpy as np 
 import time
-from helpers import flatten_img_list
+from ML_me.helpers import flatten_img_list
 import json
 import pickle  
 class NeuralNetwork():
@@ -55,10 +55,10 @@ class NeuralNetwork():
       out = self.forward(data)
       self.backward(labels)
       if i % resolution == 0:
-        #NOTE: Starckly increases train time 
-        print(self.get_recall() * 100)
+        #NOTE: Starckly increases train time print(self.get_recall() * 100)
+        
         self.losses.append(np.mean(np.square(labels - out)))
-        print("@ Epoch: {} of {}\n\t Loss: {}".format(i,epochs,self.losses[-1]))
+        print("@ Epoch: {} of {}\n\t Loss: {}, Recall {}".format(i,epochs,self.losses[-1],self.get_recall()))
     Seconds = int(time.time() - start_time)
     Minutes = Seconds // 60
     Seconds -= Minutes * 60

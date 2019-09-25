@@ -1,6 +1,6 @@
 
 import numpy as np
-import helpers as help
+import ML_me.helpers as help
 import json
 class Layer():
     def __init__(self,Type,activation="sigmoid"):
