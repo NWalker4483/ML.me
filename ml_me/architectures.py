@@ -1,9 +1,7 @@
-from ML_me.layers import Dense
 import numpy as np 
 import time
-from ML_me.helpers import flatten_img_list
-import json
 import pickle  
+
 class NeuralNetwork():
   def __init__(self):
     self._layers = []
@@ -66,6 +64,7 @@ class NeuralNetwork():
     Hours = Minutes // 60
     Minutes -= Hours * 60
     print("Total Training Time {} Hours {} Minutes {} Seconds".format(Hours,Minutes,Seconds))
+
 class AutoEncoder(NeuralNetwork):
   def __init__(self):
     NeuralNetwork.__init__(self)
@@ -98,6 +97,7 @@ class AutoEncoder(NeuralNetwork):
     if self.Bottleneck == None:
       self.Bottleneck = min(self._layers, key = lambda x: x.outputSize)
     return self.decode(np.random.normal(0,1,(n,self.Bottleneck.outputSize)))
+    
 class GAN():
   def __init__(self, Generator, Descriminator):
     self.Generator = Generator

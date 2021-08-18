@@ -1,9 +1,9 @@
 
 import numpy as np
-import ML_me.helpers as help
+import ml_me.helpers as help
 import json
 class Layer():
-    def __init__(self,Type,activation="sigmoid"):
+    def __init__(self, Type, activation="sigmoid", **kwargs):
         self.type = Type
         self._prev = None 
         self._next = None 
@@ -15,6 +15,7 @@ class Layer():
             if self._prev.type == "Pooling":
                 return self._prev.prev()
         return self._prev
+        
     def next(self):
         if self._next != None:
             if self._next.type == "Pooling":
@@ -23,8 +24,8 @@ class Layer():
     def __len__(self):
         return len(self.weights)   
 class Dense(Layer):
-    def __init__(self,layer_size,activation = "sigmoid"):
-        Layer.__init__(self, "Dense")
+    def __init__(self, layer_size, **kwargs):
+        Layer.__init__(self, "Dense", **kwargs)
         self.bias = np.zeros(layer_size)
         self.outputSize = layer_size
     def init(self,input_size):

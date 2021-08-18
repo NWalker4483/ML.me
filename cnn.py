@@ -1,9 +1,7 @@
 
 import numpy as np
-from myML import NeuralNetwork
-from layers import ConvolutionalLayer, PoolingLayer, Dense, FlattenLayer
-from helpers import flatten_img_list
-import matplotlib.pyplot as plt
+from ml_me import NeuralNetwork
+from ml_me.layers import ConvolutionalLayer, PoolingLayer, Dense, FlattenLayer
 train = True
 if train:
     print("Not Really...")

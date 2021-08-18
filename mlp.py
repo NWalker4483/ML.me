@@ -1,8 +1,8 @@
-# CHANNEL B WORKS FINE
 import numpy as np
-from myML import NeuralNetwork ,AutoEncoder
-from layers import ConvolutionalLayer, PoolingLayer, Dense
-from helpers import flatten_img_list
+from ml_me.architectures import NeuralNetwork
+from ml_me.layers import Dense
+from ml_me.helpers import flatten_img_list
+
 from keras.datasets import mnist
 import matplotlib.pyplot as plt
 
@@ -27,9 +27,9 @@ net.add(Dense(16))
 net.add(Dense(10))
 
 net.set_training_set(X[:3000],Y[:3000])
-net.train(epochs = 10000,batch_size = 200)
+net.train(epochs = 10000, batch_size = 200)
 net.save("MLP.model")
-print(net.get_recall())
+print(f"Recall: {net.get_recall()} Accuracy: {round(net.get_acc(X, Y), 3)}")
 plt.plot(range(len(net.losses)),net.losses)
 plt.title("Loss vs. Epochs")
 plt.show()
