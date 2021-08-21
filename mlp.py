@@ -17,6 +17,7 @@ X = x/255
 Y = np.array([np.zeros(10) for i in range(len(y))])
 for i in range(len(y)):
   Y[i][y[i]] = 1
+print(Y)
 
 #X = [X[i] for i in range(len(X)) if y[i]]
 X = flatten_img_list(X)

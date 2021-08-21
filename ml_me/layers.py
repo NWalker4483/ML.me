@@ -21,15 +21,19 @@ class Layer():
             if self._next.type == "Pooling":
                 return self._next.next()
         return self._next
+
     def __len__(self):
         return len(self.weights)   
+
 class Dense(Layer):
     def __init__(self, layer_size, **kwargs):
         Layer.__init__(self, "Dense", **kwargs)
         self.bias = np.zeros(layer_size)
         self.outputSize = layer_size
+
     def init(self,input_size):
-        self.weights = np.random.randn(input_size,self.outputSize)
+        self.weights = np.random.randn(input_size, self.outputSize)
+
     def forward(self,X): 
         if self._prev == None: 
             self.outputs = X
@@ -38,6 +42,7 @@ class Dense(Layer):
             self.unactivated_outputs += self.bias
             self.outputs = self.activation(self.unactivated_outputs)
         return self.outputs
+        
     def backward(self,y):
         if self._prev == None:
             return
@@ -54,6 +59,7 @@ class Dense(Layer):
         desc["size"] = self.outputSize
         desc["weights"] = json.dumps(self.weights.tolist())
         return desc
+
 class FlattenLayer(Layer):
     def __init__(self):
         Layer.__init__(self,"Flattening")
@@ -65,6 +71,7 @@ class FlattenLayer(Layer):
         #Reshape images from 
         self.outputs = x.reshape((x.shape[0],x.shape[1] * x.shape[2] * x.shape[3]))
         return self.outputs
+        
     def backward(self,y):
         self.error = self.next().delta.dot(self.next().weights.T) # Represents the direction in which the weights of the current layer need to change in order to correct the error of the next forward layer 
         self.delta = self.error*self.activation_prime(self.outputs)
@@ -111,8 +118,8 @@ class PoolingLayer(Layer): # Should act as a preserver of weights MAYBE NOT THOU
     def description(self): # Provide String representation to store the model 
         pass#return f"{self.type} {self.filter_shape} {self.stride}"
 class ConvolutionalLayer(Layer):
-    def __init__(self, layer_size, filter_shape = (3,3) , stride=1, padding = False,activation = "relu",input_shape=(-1,-1)):
-        Layer.__init__(self,"Conv",activation)
+    def __init__(self, layer_size, filter_shape = (3,3) , stride=1, padding = False, activation = "relu", input_shape=(-1,-1)):
+        Layer.__init__(self,"Conv", activation)
         self.bias = None 
         self.weights = np.random.randn(layer_size,np.product(filter_shape))
         self.filter_shape = filter_shape

@@ -11,26 +11,30 @@ class NeuralNetwork():
   def save(self,filename):
     filehandler = open(filename, 'wb+') 
     pickle.dump(self, filehandler)
+
   def load(self,filename):
     filehandler = open(filename, 'rb') 
     return pickle.load(filehandler)
+    
   def forward(self, X): 
     output = X
     for i in range(len(self._layers)):
       output = self._layers[i].forward(output)
     return output
-  def set_training_set(self,X,y):
+
+  def set_training_set(self, X, y):
     self.training_data = X
     self.training_labels = y#self.__prep_data(y) 
+
   def add(self,layer):
     self._layers.append(layer)
     if len(self._layers) == 1:
       self._layers[-1].init(0)
-      pass
     else:
       self._layers[-2]._next = self._layers[-1]
       self._layers[-1]._prev = self._layers[-2]
       self._layers[-1].init(self._layers[-2].outputSize)
+
   def backward(self, y):
     for i in range(len(self._layers))[::-1]:# TODO: Add property storage in UnTrained Layers 
       self._layers[i].backward(y)
@@ -40,10 +44,12 @@ class NeuralNetwork():
     out = self.forward(X)
     right = sum([np.argmax(out[i]) == np.argmax(y[i]) for i in range(len(out))])
     return right/len(y)
+
   def get_recall(self):
     out = self.forward(self.training_data)
     a = sum([np.argmax(out[i]) == np.argmax(self.training_labels[i]) for i in range(len(out))])
     return a / len(self.training_data)
+
   def train (self,epochs = 1000, batch_size = 32, resolution = 10):
     start_time = time.time()
     for i in range(epochs):
@@ -97,7 +103,8 @@ class AutoEncoder(NeuralNetwork):
     if self.Bottleneck == None:
       self.Bottleneck = min(self._layers, key = lambda x: x.outputSize)
     return self.decode(np.random.normal(0,1,(n,self.Bottleneck.outputSize)))
-    
+
+  
 class GAN():
   def __init__(self, Generator, Descriminator):
     self.Generator = Generator
@@ -112,3 +119,39 @@ class GAN():
       pass
     #print ("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss[0], 100*d_loss[1], g_loss))
     pass
+
+
+class SiameseNetwork(NeuralNetwork):
+    def __init__(self, loss_type = "dist"):
+        self._model = None
+        self._error_model = None
+        self.margin = 3
+        self.loss_type = loss_type 
+        
+    def set_main_model(self, model):
+        self._model = model
+        # TODO: Validate Model
+        pass
+    def set_error_model(self, model):
+        assert(self.loss_type == "model")
+        self._error_model = model
+    def add():
+        pass
+        
+    def forward(self):
+        pass
+    
+    def backward(self):
+        pass
+    
+    def train(self, epochs = 1000, batch_size = 32, resolution = 10):
+        batch_idx = np.random.choice(len(self.training_data), batch_size)
+        data = np.array([self.training_data[y] for y in batch_idx])
+        labels = np.array([self.training_labels[t] for t in batch_idx])
+        if self.loss_type == "model":
+            pass
+        else:
+            pass
+        # Get inputs
+        self._model.forward()
+        self._model.backward()

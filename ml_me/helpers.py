@@ -11,7 +11,7 @@ def sigmoidPrime(s):
 def softMax(x):
   return np.exp(x)/sum(np.exp(x))
   
-activations = {"relu":ReLU,"sigmoid":sigmoid,"tanh":np.tanh,"threshold":0,"softmax":None}
+activations = {"relu":ReLU,"sigmoid":sigmoid,"tanh":np.tanh,"threshold":0, "softmax":None}
 activations_prime = {"relu":ReLUPrime,"sigmoid":sigmoidPrime}
 
 def flatten_img_list(x):
